@@ -2,16 +2,11 @@ import time
 from abc import ABC, abstractmethod
 from tempfile import mkdtemp
 
-import chromedriver_autoinstaller
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 from content_agent.data.documents import NoSQLBaseDocument
-
-# Check if the current version of chromedriver exists
-# and if it doesn't exist, download it automatically,
-# then add chromedriver to path
-chromedriver_autoinstaller.install()
+from selenium.webdriver.chrome.service import Service
 
 
 class BaseCrawler(ABC):
@@ -50,7 +45,10 @@ class BaseSeleniumCrawler(BaseCrawler, ABC):
         self.scroll_limit = scroll_limit # Store the maximum number of times the page can be scrolled.
 
         # Create the Selenium Chrome WebDriver using the configured options.
+        service = Service(r"C:\Users\QHS\AppData\Local\Temp\chromedriver-151\chromedriver-win64\chromedriver.exe")
+
         self.driver = webdriver.Chrome(
+            service=service,
             options=options,
         )
 
