@@ -11,7 +11,7 @@ class MediumCrawler(BaseSeleniumCrawler):
 
     def set_extra_driver_options(self, options) -> None:
         # Add additional options to the Selenium WebDriver.
-        options.add_argument(r"--profile-directory=Profile 2")
+        pass
 
     def extract(self, link: str, **kwargs) -> None:
         old_model = self.model.find(link=link)  # Check if the article already exists in the database.

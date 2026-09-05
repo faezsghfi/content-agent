@@ -74,7 +74,7 @@ def crawl_links(
     return links
 
 
-@pipeline
+@pipeline(enable_cache=False)
 def digital_data_etl(
     user_full_name: str,
     links: list[str],

@@ -68,6 +68,10 @@ class Settings(BaseSettings):
     LINKEDIN_USERNAME: str | None = None
     LINKEDIN_PASSWORD: str | None = None
 
+    # Chrome / Selenium
+    CHROME_PROFILE_DIRECTORY: str = "Profile 1"
+
+
     @property
     def OPENAI_MAX_TOKEN_WINDOW(self) -> int:
         official_max_token_window = {
