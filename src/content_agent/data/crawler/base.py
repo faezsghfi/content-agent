@@ -1,12 +1,11 @@
 import time
 from abc import ABC, abstractmethod
-from tempfile import mkdtemp
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 from content_agent.data.documents import NoSQLBaseDocument
-from selenium.webdriver.chrome.service import Service
+from content_agent.settings import settings
 
 
 class BaseCrawler(ABC):
@@ -25,9 +24,10 @@ class BaseSeleniumCrawler(BaseCrawler, ABC):
 
         # Create Chrome browser options.
         options = webdriver.ChromeOptions()
+        options.add_argument(f"--profile-directory={settings.CHROME_PROFILE_DIRECTORY}")
 
         options.add_argument("--no-sandbox") # Allow Chrome to run without the sandbox.
-        options.add_argument("--headless=new") # Run Chrome in headless mode, so no browser window is displayed.
+        # options.add_argument("--headless=new") # Run Chrome in headless mode, so no browser window is displayed.
         options.add_argument("--disable-dev-shm-usage") # Prevent issues caused by limited shared memory in Docker or Linux environments.
         options.add_argument("--log-level=3") # Reduce the amount of Chrome logging output.
         options.add_argument("--disable-popup-blocking") # Disable browser pop-up blocking.
@@ -35,22 +35,21 @@ class BaseSeleniumCrawler(BaseCrawler, ABC):
         options.add_argument("--disable-extensions") # Disable Chrome extensions.
         options.add_argument("--disable-background-networking") # Disable unnecessary background network activity.
         options.add_argument("--ignore-certificate-errors") # Ignore SSL certificate errors.
-        options.add_argument(f"--user-data-dir={mkdtemp()}") # Create a temporary directory for Chrome's user profile.
-        options.add_argument(f"--data-path={mkdtemp()}") # Create a temporary directory for Chrome's data files.
-        options.add_argument(f"--disk-cache-dir={mkdtemp()}") # Create a temporary directory for Chrome's disk cache.
-        options.add_argument("--remote-debugging-port=9226") # Enable remote debugging on port 9226.
+        # options.add_argument(f"--user-data-dir={mkdtemp()}") # Create a temporary directory for Chrome's user profile.
+        # options.add_argument(f"--data-path={mkdtemp()}") # Create a temporary directory for Chrome's data files.
+        # options.add_argument(f"--disk-cache-dir={mkdtemp()}") # Create a temporary directory for Chrome's disk cache.
+        # options.add_argument("--remote-debugging-port=9226") # Enable remote debugging on port 9226.
 
         self.set_extra_driver_options(options) # Allow subclasses to add their own Chrome options if needed.
 
         self.scroll_limit = scroll_limit # Store the maximum number of times the page can be scrolled.
 
-        # Create the Selenium Chrome WebDriver using the configured options.
-        service = Service(r"C:\Users\QHS\AppData\Local\Temp\chromedriver-151\chromedriver-win64\chromedriver.exe")
-
-        self.driver = webdriver.Chrome(
-            service=service,
-            options=options,
+        options.add_experimental_option(
+            "debuggerAddress",
+            "127.0.0.1:9222",
         )
+
+        self.driver = webdriver.Chrome(options=options)
 
     def set_extra_driver_options(self, options: Options) -> None:
         # Hook for subclasses to add additional Chrome options.
