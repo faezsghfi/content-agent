@@ -41,7 +41,7 @@ class MediumCrawler(BaseSeleniumCrawler):
             "Content": soup.get_text(),
         }
 
-        self.driver.close() # Close the WebDriver to release browser resources.
+        self.driver.quit() # Close the WebDriver to release browser resources.
 
         user = kwargs["user"] # Get the user who owns or submitted the article.
 
