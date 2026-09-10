@@ -2,8 +2,8 @@ from typing_extensions import Annotated
 
 from zenml import get_step_context, pipeline, step
 
-from content_agent.data.crawler.dispatcher import CrawlerDispatcher
-from content_agent.data.documents.documents import UserDocument
+from content_agent.crawling_data.crawler.dispatcher import CrawlerDispatcher
+from content_agent.crawling_data.documents.documents import UserDocument
 from content_agent.utils import split_user_full_name
 from loguru import logger
 

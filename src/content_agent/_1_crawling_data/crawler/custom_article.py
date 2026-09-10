@@ -4,7 +4,7 @@ from langchain_community.document_loaders import AsyncHtmlLoader
 from langchain_community.document_transformers.html2text import Html2TextTransformer
 from loguru import logger
 
-from content_agent.data.documents.documents import ArticleDocument
+from content_agent.crawling_data.documents.documents import ArticleDocument
 
 from .base import BaseCrawler
 

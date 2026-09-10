@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from bs4.element import Tag
 from loguru import logger
 
-from content_agent.data.documents.documents import PostDocument
+from content_agent.crawling_data.documents.documents import PostDocument
 
 from .base import BaseSeleniumCrawler
 

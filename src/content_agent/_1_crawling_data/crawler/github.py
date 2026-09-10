@@ -5,7 +5,7 @@ import tempfile
 
 from loguru import logger
 
-from content_agent.data.documents.documents import RepositoryDocument
+from content_agent.crawling_data.documents.documents import RepositoryDocument
 
 from .base import BaseCrawler
 

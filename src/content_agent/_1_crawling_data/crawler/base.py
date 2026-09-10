@@ -5,7 +5,7 @@ from tempfile import mkdtemp
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-from content_agent.data.documents import NoSQLBaseDocument
+from content_agent.crawling_data.documents import NoSQLBaseDocument
 
 
 class BaseCrawler(ABC):

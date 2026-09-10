@@ -6,7 +6,7 @@ authors = [
     {name = "faeze saghafi", email = "faeze.saghafi@gmail.com"}
 ]
 requires-python = ">=3.11,<3.15"
-dependencies = ["selenium (>=4.48.0,<5.0.0)", "chromedriver-autoinstaller (>=0.6.4,<0.7.0)", "loguru (>=0.7.3,<0.8.0)", "pydantic (>=2.12,<2.13)", "pymongo (>=4.17.0,<5.0.0)", "pydantic-settings (>=2.15.0,<3.0.0)", "zenml (>=0.96.3,<0.97.0)", "beautifulsoup4 (>=4.15.0,<5.0.0)", "langchain-community (>=0.4.2,<0.5.0)", "sqlalchemy-utils (>=0.42.1,<0.43.0)", "sqlmodel (>=0.0.42,<0.0.43)", "passlib (>=1.7.4,<2.0.0)", "pymysql (>=1.2.0,<2.0.0)", "alembic (>=1.19.1,<2.0.0)", "bcrypt (<4)", "html2text (>=2025.4.15,<2026.0.0)"]
+dependencies = ["selenium (>=4.48.0,<5.0.0)", "chromedriver-autoinstaller (>=0.6.4,<0.7.0)", "loguru (>=0.7.3,<0.8.0)", "pydantic (>=2.12,<2.13)", "pymongo (>=4.17.0,<5.0.0)", "pydantic-settings (>=2.15.0,<3.0.0)", "zenml (>=0.96.3,<0.97.0)", "beautifulsoup4 (>=4.15.0,<5.0.0)", "langchain-community (>=0.4.2,<0.5.0)", "sqlalchemy-utils (>=0.42.1,<0.43.0)", "sqlmodel (>=0.0.42,<0.0.43)", "passlib (>=1.7.4,<2.0.0)", "pymysql (>=1.2.0,<2.0.0)", "alembic (>=1.19.1,<2.0.0)", "bcrypt (<4)", "html2text (>=2025.4.15,<2026.0.0)", "tiktoken (>=0.14.0,<0.15.0)", "langchain-openai (>=1.6.2,<2.0.0)", "qdrant-client (>=1.19.0,<2.0.0)", "scikit-learn (>=1.9.0,<2.0.0)", "langchain-text-splitters (>=1.1.2,<2.0.0)", "sentence-transformers (>=6.0.1,<7.0.0)", "datasets (>=5.0.1,<6.0.0)"]
 
 
 [build-system]

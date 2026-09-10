@@ -7,7 +7,7 @@ from pydantic import UUID4, BaseModel, Field
 from pymongo import errors
 
 from content_agent.exceptions import ImproperlyConfigured
-from content_agent.data.database.mongo import connection
+from content_agent.crawling_data.raw_database.mongo import connection
 from content_agent.settings import settings
 
 
