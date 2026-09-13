@@ -2,6 +2,7 @@ from src.content_agent._4_rag.base import VectorBaseDocument
 from content_agent._2_instruction_dataset.generation.cleaned_documents import CleanedDocument
 from content_agent._2_instruction_dataset.generation.types import DataCategory
 
+# Defines the prompt templates used for generating structured training examples.
 
 class Prompt(VectorBaseDocument):
     template: str
@@ -11,7 +12,6 @@ class Prompt(VectorBaseDocument):
 
     class Config:
         category = DataCategory.PROMPT
-
 
 class GenerateDatasetSamplesPrompt(Prompt):
     data_category: DataCategory

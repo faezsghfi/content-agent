@@ -1,5 +1,6 @@
 from langchain_core.output_parsers import PydanticOutputParser
 
+# Parses and validates language-model outputs into structured dataset records.
 
 class ListPydanticOutputParser(PydanticOutputParser):
     def _parse_obj(self, obj: dict | list):

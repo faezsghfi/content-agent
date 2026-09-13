@@ -6,6 +6,7 @@ from content_agent._2_instruction_dataset.generation.dataset import DatasetType
 from content_agent._2_instruction_dataset.generation.prompt import GenerateDatasetSamplesPrompt
 from content_agent._2_instruction_dataset.generation.types import DataCategory
 
+# Creates prompts from cleaned documents to generate instruction and preference examples.
 
 @step
 def create_prompts(

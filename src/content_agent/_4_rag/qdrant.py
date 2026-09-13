@@ -2,8 +2,9 @@ from loguru import logger
 from qdrant_client import QdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
 
-from llm_engineering.settings import settings
+from content_agent.settings import settings
 
+# Provides a singleton Qdrant client for connecting to either a local or cloud vector database.
 
 class QdrantDatabaseConnector:
     _instance: QdrantClient | None = None

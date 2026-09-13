@@ -17,53 +17,82 @@ from content_agent._4_rag.qdrant import connection
 
 T = TypeVar("T", bound="VectorBaseDocument")
 
-
+# Base model for documents that are stored and searched as vectors in Qdrant.
+# Subclasses inherit the common functionality for inserting, retrieving, 
+# and searching vector documents.
 class VectorBaseDocument(BaseModel, Generic[T], ABC):
-    id: UUID4 = Field(default_factory=uuid.uuid4)
+    id: UUID4 = Field(default_factory=uuid.uuid4) # Every document gets a unique UUID if no ID is provided.
 
     def __eq__(self, value: object) -> bool:
+        # Two documents are considered equal if they have the same class and ID.
         if not isinstance(value, self.__class__):
             return False
 
         return self.id == value.id
 
     def __hash__(self) -> int:
+        # Use the document ID to make the document hashable.
         return hash(self.id)
 
     @classmethod
     def from_record(cls: Type[T], point: Record) -> T:
-        _id = UUID(point.id, version=4)
-        payload = point.payload or {}
+        # Convert a Qdrant record into a Python document object.
 
+        # Qdrant stores the point ID as a string, so convert it back to UUID.
+        _id = UUID(point.id, version=4)
+        payload = point.payload or {} # Get the stored payload; use an empty dictionary if there is no payload.
+
+
+        # Build the document attributes from the ID and Qdrant payload.
         attributes = {
             "id": _id,
             **payload,
         }
+
+        # If the document class defines an embedding field, 
+        # also restore the vector stored in Qdrant.
         if cls._has_class_attribute("embedding"):
             attributes["embedding"] = point.vector or None
 
         return cls(**attributes)
 
     def to_point(self: T, **kwargs) -> PointStruct:
+        # Convert a Python document object into a Qdrant PointStruct.
         exclude_unset = kwargs.pop("exclude_unset", False)
         by_alias = kwargs.pop("by_alias", True)
 
+
+        # Convert the Pydantic document into a dictionary 
+        # that can be stored as Qdrant payload.
         payload = self.model_dump(exclude_unset=exclude_unset, by_alias=by_alias, **kwargs)
 
+
+        # Remove the ID from the payload because Qdrant stores it separately.
         _id = str(payload.pop("id"))
+
+        # Remove the embedding from the payload because Qdrant stores 
+        # the embedding as the vector part of the point.
         vector = payload.pop("embedding", {})
+
+        # Convert NumPy arrays into normal Python lists because Qdrant expects a serializable vector.
         if vector and isinstance(vector, np.ndarray):
             vector = vector.tolist()
 
+        # Create the Qdrant point containing ID, vector, and payload.
         return PointStruct(id=_id, vector=vector, payload=payload)
 
     def model_dump(self: T, **kwargs) -> dict:
+        # Extend Pydantic's model_dump to make UUID values JSON/database friendly.
+
+        # Convert UUID objects to strings, including nested UUID values.
         dict_ = super().model_dump(**kwargs)
 
         dict_ = self._uuid_to_str(dict_)
 
         return dict_
 
+
+# Recursively convert UUID values inside dictionaries and lists to strings.
     def _uuid_to_str(self, item: Any) -> Any:
         if isinstance(item, dict):
             for key, value in item.items():
@@ -76,6 +105,7 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
 
         return item
 
+# Insert multiple documents into Qdrant at once.
     @classmethod
     def bulk_insert(cls: Type[T], documents: list["VectorBaseDocument"]) -> bool:
         try:
@@ -104,6 +134,7 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
 
     @classmethod
     def bulk_find(cls: Type[T], limit: int = 10, **kwargs) -> tuple[list[T], UUID | None]:
+        # Retrieve multiple documents from Qdrant using pagination.
         try:
             documents, next_offset = cls._bulk_find(limit=limit, **kwargs)
         except exceptions.UnexpectedResponse:
@@ -136,6 +167,7 @@ class VectorBaseDocument(BaseModel, Generic[T], ABC):
 
     @classmethod
     def search(cls: Type[T], query_vector: list, limit: int = 10, **kwargs) -> list[T]:
+        # Search Qdrant for documents similar to the given query vector.
         try:
             documents = cls._search(query_vector=query_vector, limit=limit, **kwargs)
         except exceptions.UnexpectedResponse:

@@ -1,6 +1,7 @@
 from threading import Lock
 from typing import ClassVar
 
+# Provides a thread-safe Singleton metaclass for sharing reusable RAG components.
 
 class SingletonMeta(type):
     """

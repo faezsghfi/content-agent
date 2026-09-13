@@ -8,17 +8,18 @@ from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from loguru import logger
 
-from content_agent._2_instruction_dataset.generation import utils
-from content_agent._2_instruction_dataset.generation.cleaned_documents import CleanedDocument
-from content_agent._2_instruction_dataset.generation.dataset import DatasetType, TrainTestSplit
-from content_agent._2_instruction_dataset.generation.prompt import GenerateDatasetSamplesPrompt, Prompt
-from content_agent._2_instruction_dataset.generation.types import DataCategory
+from content_agent._3_instruction_dataset.generation import utils
+from content_agent._3_instruction_dataset.generation.cleaned_documents import CleanedDocument
+from content_agent._3_instruction_dataset.generation.dataset import DatasetType, TrainTestSplit
+from content_agent._3_instruction_dataset.generation.prompt import GenerateDatasetSamplesPrompt, Prompt
+from content_agent._3_instruction_dataset.generation.types import DataCategory
 from content_agent.settings import settings
 
 from . import constants
 from . import utils as generation_utils
 from .output_parsers import ListPydanticOutputParser
 
+# Orchestrates the generation process for instruction and preference datasets.
 
 class DatasetGenerator(ABC):
     tokenizer = tiktoken.encoding_for_model(settings.OPENAI_MODEL_ID)

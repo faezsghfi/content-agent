@@ -5,6 +5,7 @@ from zenml import step
 from content_agent._2_instruction_dataset.generation.dataset import InstructTrainTestSplit, PreferenceTrainTestSplit
 from content_agent.settings import settings
 
+# Publishes the generated dataset to the Hugging Face Hub.
 
 @step
 def push_to_huggingface(

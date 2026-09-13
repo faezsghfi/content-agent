@@ -1,5 +1,7 @@
 from content_agent._2_instruction_dataset.generation.dataset import DatasetType
 
+# Stores shared constants used throughout the instruction dataset generation pipeline.
+
 MOCKED_RESPONSE_INSTRUCT = """
 [
     {"instruction": "<mocked generated instruction> 1", "answer": "<mocked generated answer> 1"},

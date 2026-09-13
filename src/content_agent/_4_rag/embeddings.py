@@ -13,6 +13,7 @@ from content_agent.settings import settings
 
 from .base import SingletonMeta
 
+# Provides singleton embedding and cross-encoder models for vector retrieval and document reranking.
 
 class EmbeddingModelSingleton(metaclass=SingletonMeta):
     """

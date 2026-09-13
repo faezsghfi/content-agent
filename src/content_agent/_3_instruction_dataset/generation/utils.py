@@ -12,6 +12,7 @@ from content_agent._2_instruction_dataset.generation.dataset import (
 )
 from content_agent._2_instruction_dataset.generation.types import DataCategory
 
+# Provides utility functions shared across the dataset generation pipeline.
 
 def create_instruct_train_test_split(
     data: dict[DataCategory, InstructDataset], test_size=0.2, random_state=42

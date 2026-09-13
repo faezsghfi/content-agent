@@ -1,5 +1,6 @@
 from enum import StrEnum
 
+# Defines shared types and data structures used by the dataset generation components.
 
 class DataCategory(StrEnum):
     PROMPT = "prompt"

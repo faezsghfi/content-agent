@@ -12,6 +12,8 @@ from content_agent._2_instruction_dataset.generation.base.vector import VectorBa
 from content_agent._2_instruction_dataset.generation.types import DataCategory
 
 
+# Defines dataset structures and utilities for managing generated instruction data.
+
 class DatasetType(Enum):
     INSTRUCTION = "instruction"
     PREFERENCE = "preference"

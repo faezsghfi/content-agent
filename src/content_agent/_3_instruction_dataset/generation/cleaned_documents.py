@@ -6,6 +6,7 @@ from pydantic import UUID4
 from .base import VectorBaseDocument
 from .types import DataCategory
 
+# # Defines cleaned document models used as inputs for instruction and preference dataset generation.
 
 class CleanedDocument(VectorBaseDocument, ABC):
     content: str
