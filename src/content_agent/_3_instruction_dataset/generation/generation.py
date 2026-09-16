@@ -13,7 +13,7 @@ from content_agent._3_instruction_dataset.generation.cleaned_documents import Cl
 from content_agent._3_instruction_dataset.generation.dataset import DatasetType, TrainTestSplit
 from content_agent._3_instruction_dataset.generation.prompt import GenerateDatasetSamplesPrompt, Prompt
 from content_agent._3_instruction_dataset.generation.types import DataCategory
-from content_agent.settings import settings
+from content_agent.utilities.settings import settings
 
 from . import constants
 from . import utils as generation_utils

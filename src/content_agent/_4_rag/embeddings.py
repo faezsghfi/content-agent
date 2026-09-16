@@ -9,7 +9,7 @@ from sentence_transformers.SentenceTransformer import SentenceTransformer
 from sentence_transformers.cross_encoder import CrossEncoder
 from transformers import AutoTokenizer
 
-from content_agent.settings import settings
+from content_agent.utilities.settings import settings
 
 from .base import SingletonMeta
 

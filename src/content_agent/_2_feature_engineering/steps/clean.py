@@ -1,8 +1,8 @@
 from typing_extensions import Annotated
 from zenml import get_step_context, step
 
-from llm_engineering.application.preprocessing import CleaningDispatcher
-from llm_engineering.domain.cleaned_documents import CleanedDocument
+from content_agent._2_feature_engineering.preprocessing.dispatchers import CleaningDispatcher
+from content_agent._3_instruction_dataset.generation.cleaned_documents import CleanedDocument
 
 
 @step

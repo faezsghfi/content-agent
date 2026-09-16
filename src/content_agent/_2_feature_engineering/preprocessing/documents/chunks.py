@@ -3,8 +3,8 @@ from typing import Optional
 
 from pydantic import UUID4, Field
 
-from llm_engineering.domain.base import VectorBaseDocument
-from llm_engineering.domain.types import DataCategory
+from content_agent._3_instruction_dataset.generation.base.vector import VectorBaseDocument
+from content_agent._3_instruction_dataset.generation.types import DataCategory
 
 
 class Chunk(VectorBaseDocument, ABC):

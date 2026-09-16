@@ -2,9 +2,8 @@ from abc import ABC
 
 from pydantic import UUID4, Field
 
-from llm_engineering.domain.types import DataCategory
-
-from .base import VectorBaseDocument
+from content_agent._3_instruction_dataset.generation.types import DataCategory
+from content_agent._3_instruction_dataset.generation.base.vector import VectorBaseDocument
 
 
 class EmbeddedChunk(VectorBaseDocument, ABC):

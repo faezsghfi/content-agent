@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, cast
 
-from llm_engineering.application.networks import EmbeddingModelSingleton
-from llm_engineering.domain.chunks import ArticleChunk, Chunk, PostChunk, RepositoryChunk
-from llm_engineering.domain.embedded_chunks import (
+from content_agent._4_rag.embeddings import EmbeddingModelSingleton
+from content_agent._2_feature_engineering.preprocessing.documents.chunks import ArticleChunk, Chunk, PostChunk, RepositoryChunk
+from content_agent._2_feature_engineering.preprocessing.documents.embedded_chunks import (
     EmbeddedArticleChunk,
     EmbeddedChunk,
     EmbeddedPostChunk,
     EmbeddedRepositoryChunk,
 )
-from llm_engineering.domain.queries import EmbeddedQuery, Query
+from content_agent._2_feature_engineering.steps.queries import EmbeddedQuery, Query
 
 ChunkT = TypeVar("ChunkT", bound=Chunk)
 EmbeddedChunkT = TypeVar("EmbeddedChunkT", bound=EmbeddedChunk)

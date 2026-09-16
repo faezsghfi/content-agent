@@ -1,20 +1,20 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from llm_engineering.domain.cleaned_documents import (
+from content_agent._3_instruction_dataset.generation.cleaned_documents import (
     CleanedArticleDocument,
     CleanedDocument,
     CleanedPostDocument,
     CleanedRepositoryDocument,
 )
-from llm_engineering.domain.documents import (
+from content_agent._1_crawling_data.documents.documents import (
     ArticleDocument,
     Document,
     PostDocument,
     RepositoryDocument,
 )
 
-from .operations import clean_text
+from content_agent._2_feature_engineering.preprocessing.operations.cleaning import clean_text
 
 DocumentT = TypeVar("DocumentT", bound=Document)
 CleanedDocumentT = TypeVar("CleanedDocumentT", bound=CleanedDocument)

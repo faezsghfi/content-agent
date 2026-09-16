@@ -3,15 +3,15 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 from uuid import UUID
 
-from llm_engineering.domain.chunks import ArticleChunk, Chunk, PostChunk, RepositoryChunk
-from llm_engineering.domain.cleaned_documents import (
+from content_agent._2_feature_engineering.preprocessing.documents.chunks import ArticleChunk, Chunk, PostChunk, RepositoryChunk
+from content_agent._3_instruction_dataset.generation.cleaned_documents import (
     CleanedArticleDocument,
     CleanedDocument,
     CleanedPostDocument,
     CleanedRepositoryDocument,
 )
 
-from .operations import chunk_article, chunk_text
+from content_agent._2_feature_engineering.preprocessing.operations.chunking import chunk_article, chunk_text
 
 CleanedDocumentT = TypeVar("CleanedDocumentT", bound=CleanedDocument)
 ChunkT = TypeVar("ChunkT", bound=Chunk)

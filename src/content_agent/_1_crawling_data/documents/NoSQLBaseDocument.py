@@ -6,9 +6,9 @@ from loguru import logger
 from pydantic import UUID4, BaseModel, Field
 from pymongo import errors
 
-from content_agent.exceptions import ImproperlyConfigured
+from content_agent.utilities.exceptions import ImproperlyConfigured
 from content_agent._1_crawling_data.raw_database.mongo import connection
-from content_agent.settings import settings
+from content_agent.utilities.settings import settings
 
 
 # Create a connection to the MongoDB database.

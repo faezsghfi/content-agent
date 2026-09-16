@@ -1,8 +1,8 @@
 import re
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter, SentenceTransformersTokenTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter, SentenceTransformersTokenTextSplitter
 
-from llm_engineering.application.networks import EmbeddingModelSingleton
+from content_agent._4_rag.embeddings import EmbeddingModelSingleton
 
 embedding_model = EmbeddingModelSingleton()
 

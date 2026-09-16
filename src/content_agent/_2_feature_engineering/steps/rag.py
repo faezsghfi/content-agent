@@ -1,10 +1,10 @@
 from typing_extensions import Annotated
 from zenml import get_step_context, step
 
-from llm_engineering.application import utils
-from llm_engineering.application.preprocessing import ChunkingDispatcher, EmbeddingDispatcher
-from llm_engineering.domain.chunks import Chunk
-from llm_engineering.domain.embedded_chunks import EmbeddedChunk
+from content_agent.utilities import misc
+from content_agent._2_feature_engineering.preprocessing.dispatchers import ChunkingDispatcher, EmbeddingDispatcher
+from content_agent._2_feature_engineering.preprocessing.documents.chunks import Chunk
+from content_agent._2_feature_engineering.preprocessing.documents.embedded_chunks import EmbeddedChunk
 
 
 @step
@@ -18,7 +18,7 @@ def chunk_and_embed(
         chunks = ChunkingDispatcher.dispatch(document)
         metadata["chunking"] = _add_chunks_metadata(chunks, metadata["chunking"])
 
-        for batched_chunks in utils.misc.batch(chunks, 10):
+        for batched_chunks in misc.batch(chunks, 10):
             batched_embedded_chunks = EmbeddingDispatcher.dispatch(batched_chunks)
             embedded_chunks.extend(batched_embedded_chunks)
 

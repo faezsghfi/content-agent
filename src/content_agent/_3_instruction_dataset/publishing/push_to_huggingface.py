@@ -2,8 +2,8 @@ from loguru import logger
 from typing_extensions import Annotated
 from zenml import step
 
-from content_agent._2_instruction_dataset.generation.dataset import InstructTrainTestSplit, PreferenceTrainTestSplit
-from content_agent.settings import settings
+from content_agent._3_instruction_dataset.generation.dataset import InstructTrainTestSplit, PreferenceTrainTestSplit
+from content_agent.utilities.settings import settings
 
 # Publishes the generated dataset to the Hugging Face Hub.
 
