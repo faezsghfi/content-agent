@@ -3,10 +3,10 @@ from typing import Any
 from typing_extensions import Annotated
 from zenml import ArtifactConfig, get_step_context, step
 
-from content_agent._2_instruction_dataset.generation.dataset import generation
-from content_agent._2_instruction_dataset.generation.dataset import DatasetType, PreferenceTrainTestSplit
-from content_agent._2_instruction_dataset.generation.prompt import GenerateDatasetSamplesPrompt
-from content_agent._2_instruction_dataset.generation.types import DataCategory
+from content_agent._3_instruction_dataset.generation import generation
+from content_agent._3_instruction_dataset.generation.dataset import DatasetType, PreferenceTrainTestSplit
+from content_agent._3_instruction_dataset.generation.prompt import GenerateDatasetSamplesPrompt
+from content_agent._3_instruction_dataset.generation.types import DataCategory
 
 # Generates preference pairs used to build preference datasets for model alignment.
 

@@ -11,9 +11,7 @@ class Settings(BaseSettings):
 
     # OpenAI API
     OPENAI_MODEL_ID: str = "gpt-4o-mini"
-    OPENAI_API_KEY: str | None = None
-
-    # Huggingface API
+    OPENAI_API_KEY: str | None = None   
     HUGGINGFACE_ACCESS_TOKEN: str | None = None
 
     # Comet ML (during training)

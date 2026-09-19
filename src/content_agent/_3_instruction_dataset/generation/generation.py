@@ -8,9 +8,9 @@ from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from loguru import logger
 
-from content_agent._3_instruction_dataset.generation import utils
+from content_agent.utilities import misc
 from content_agent._3_instruction_dataset.generation.cleaned_documents import CleanedDocument
-from content_agent._3_instruction_dataset.generation.dataset import DatasetType, TrainTestSplit
+from content_agent._3_instruction_dataset.generation.dataset import DatasetType, TrainTestSplit , build_dataset , PreferenceDatasetSample , InstructDatasetSample , InstructDataset , PreferenceDataset
 from content_agent._3_instruction_dataset.generation.prompt import GenerateDatasetSamplesPrompt, Prompt
 from content_agent._3_instruction_dataset.generation.types import DataCategory
 from content_agent.utilities.settings import settings
@@ -19,11 +19,19 @@ from . import constants
 from . import utils as generation_utils
 from .output_parsers import ListPydanticOutputParser
 
-# Orchestrates the generation process for instruction and preference datasets.
+# Base class that contains the common logic for generating
+# both Instruction and Preference datasets.
+#
+# The subclasses only define:
+# - which type of dataset they generate
+# - the prompt used to generate samples
+# - how the generated datasets are post-processed
 
 class DatasetGenerator(ABC):
+    # Tokenizer used to count and limit the number of tokens
+    # sent to the OpenAI model.
     tokenizer = tiktoken.encoding_for_model(settings.OPENAI_MODEL_ID)
-    dataset_type: DatasetType | None = None
+    dataset_type: DatasetType | None = None # The subclass sets this to INSTRUCTION or PREFERENCE.
 
     system_prompt_template = """You are a helpful assistant who generates {dataset_format} based on the given context. \
 Provide your response in JSON format.
@@ -32,8 +40,15 @@ Provide your response in JSON format.
 
     @classmethod
     def get_system_prompt(cls) -> Prompt:
+        # A dataset type must be defined before creating the system prompt.
         assert cls.dataset_type is not None, "Dataset type must be set before calling get_system_prompt()"
 
+
+        # Instruction datasets contain pairs:
+        # instruction + answer
+        #
+        # Preference datasets contain triples:
+        # instruction + rejected + chosen
         dataset_format = (
             "instruction-answer pairs" if cls.dataset_type == DatasetType.INSTRUCTION else "instruction-answer triples"
         )
@@ -50,9 +65,14 @@ Provide your response in JSON format.
 
     @classmethod
     def get_prompts(cls, documents: list[CleanedDocument]) -> dict[DataCategory, list[GenerateDatasetSamplesPrompt]]:
+        # Extract the relevant parts of the cleaned documents
+        # before creating prompts.
         documents = generation_utils.extract_substrings(documents)
 
+
+        # Group documents according to their data category.
         grouped_prompts = {}
+         # Create one generation prompt for each document.
         grouped_cleaned_documents = CleanedDocument.group_by_category(documents)
         for category, category_documents in grouped_cleaned_documents.items():
             category_prompts = [cls.get_prompt(document) for document in category_documents]
@@ -62,23 +82,52 @@ Provide your response in JSON format.
 
     @classmethod
     def get_prompt(cls, document: CleanedDocument) -> GenerateDatasetSamplesPrompt:
+        # Every concrete dataset generator must define
+        # its own prompt template.
         assert cls.prompt_template_str is not None, "Prompt template must be set before calling get_prompt()"
 
+        # Get the category of the current document.
         data_category = document.get_category()
 
+        # Convert the Jinja2 prompt template into a LangChain PromptTemplate.
         prompt_template = PromptTemplate.from_template(
             template=cls.prompt_template_str,
             template_format="jinja2",
         )
+
+        # The cleaned document is inserted into the {{extract}} variable
+        # of the prompt template.
         input_variables = {
             "extract": document.content,
         }
         prompt = prompt_template.format(**input_variables)
-        prompt_tokens = cls.tokenizer.encode(prompt)
+        prompt_tokens = cls.tokenizer.encode(prompt) # Count the number of tokens in the generated prompt.
         if len(prompt_tokens) > settings.OPENAI_MAX_TOKEN_WINDOW:
             prompt_tokens = prompt_tokens[: settings.OPENAI_MAX_TOKEN_WINDOW]
             prompt = cls.tokenizer.decode(prompt_tokens)
 
+
+        logger.info(
+            f"document type: {type(document)}"
+        )
+
+        logger.info(
+            f"document module: {type(document).__module__}"
+        )
+
+        logger.info(
+            f"expected CleanedDocument: {CleanedDocument}"
+        )
+
+        logger.info(
+            f"expected module: {CleanedDocument.__module__}"
+        )
+
+        logger.info(
+            f"isinstance result: {isinstance(document, CleanedDocument)}"
+        )
+
+        # Store the generated prompt together with useful metadata.
         prompt = GenerateDatasetSamplesPrompt(
             template=prompt_template.template,
             input_variables=input_variables,
@@ -97,76 +146,142 @@ Provide your response in JSON format.
         test_size: float = 0.2,
         mock: bool = False,
     ) -> TrainTestSplit:
-        assert cls.dataset_type is not None, "Dataset type must be set before calling generate()"
 
+        # The dataset type must be defined by the subclass.
+        assert cls.dataset_type is not None, (
+            "Dataset type must be set before calling generate()"
+        )
+
+        # Convert our prompts into the message format expected by LangChain.
         def _to_langchain(
             prompt: GenerateDatasetSamplesPrompt,
         ) -> list[BaseMessage]:
             messages = [
+                # System message tells the LLM what kind of dataset to generate.
                 SystemMessage(content=cls.get_system_prompt().content),
+                # Human message contains the actual prompt and document extract.
                 HumanMessage(content=prompt.content),
             ]
 
             return messages
 
+        # During development/testing, FakeListLLM can be used
+        # instead of making real API calls.
         if mock:
-            llm = FakeListLLM(responses=[constants.get_mocked_response(cls.dataset_type)])
+            llm = FakeListLLM(
+                responses=[constants.get_mocked_response(cls.dataset_type)]
+            )
         else:
-            assert settings.OPENAI_API_KEY is not None, "OpenAI API key must be set to generate datasets"
+            # Real dataset generation requires an OpenAI API key.
+            assert settings.OPENAI_API_KEY is not None, (
+                "OpenAI API key must be set to generate datasets"
+            )
 
             llm = ChatOpenAI(
                 model=settings.OPENAI_MODEL_ID,
                 api_key=settings.OPENAI_API_KEY,
-                max_tokens=2000 if cls.dataset_type == DatasetType.PREFERENCE else 1200,
+                max_tokens=(
+                    2000
+                    if cls.dataset_type == DatasetType.PREFERENCE
+                    else 1200
+                ),
                 temperature=0.7,
             )
-        parser = ListPydanticOutputParser(pydantic_object=cls._get_dataset_sample_type())
 
+        # Parser converts the LLM's JSON output into our Pydantic
+        # dataset sample objects.
+        parser = ListPydanticOutputParser(
+            pydantic_object=cls._get_dataset_sample_type()
+        )
+
+        # LangChain pipeline:
+        # prompts -> LLM -> output parser -> structured dataset samples
         chain = llm | parser
 
         datasets = {}
-        for category, category_prompts in prompts.items():
-            langchain_category_prompts = [_to_langchain(prompt) for prompt in category_prompts]
-            batches = utils.misc.batch(langchain_category_prompts, size=24)
 
-            flattened_instruct_dataset_samples = []
+        for category, category_prompts in prompts.items():
+            logger.info(
+                f"Category '{category}': {len(category_prompts)} prompts"
+            )
+
+            langchain_category_prompts = [
+                _to_langchain(prompt)
+                for prompt in category_prompts
+            ]
+
+            # Split prompts into batches of 24.
+            batches = misc.batch(
+                langchain_category_prompts,
+                size=24,
+            )
+
+            flattened_dataset_samples = []
+
             for batch in batches:
                 try:
-                    batched_dataset_samples = chain.batch(batch, stop=None)
+                    # Run the LLM + parser chain on the batch.
+                    batched_dataset_samples = chain.batch(
+                        batch,
+                        stop=None,
+                    )
 
-                    for instruct_dataset_sample_batch in batched_dataset_samples:
-                        flattened_instruct_dataset_samples.extend(instruct_dataset_sample_batch)
+                    # Flatten the results of different batches
+                    # into one list of samples.
+                    for dataset_sample_batch in batched_dataset_samples:
+                        flattened_dataset_samples.extend(
+                            dataset_sample_batch
+                        )
+
                 except OutputParserException:
-                    logger.exception(f"Failed to parse the output JSON for a batch for category {category}")
+                    logger.exception(
+                        "Failed to parse the output JSON for a batch "
+                        f"for category {category}"
+                    )
+                    raise
 
-            dataset = domain.dataset.build_dataset(
-                dataset_type=cls.dataset_type, category=category, samples=flattened_instruct_dataset_samples
+            logger.info(
+                f"Category '{category}': "
+                f"{len(flattened_dataset_samples)} generated samples"
             )
-            datasets[category] = dataset
-            logger.info(f"Generated {len(dataset.samples)} samples for category '{category}'.")
 
-        processed_datasets = cls.post_process_datasets(datasets, test_size=test_size)
+            # Convert the generated samples into our domain dataset object.
+            dataset = build_dataset(
+                dataset_type=cls.dataset_type,
+                category=category,
+                samples=flattened_dataset_samples,
+            )
+
+            datasets[category] = dataset
+
+            logger.info(
+                f"Generated {len(dataset.samples)} samples "
+                f"for category '{category}'."
+            )
+
+        # Apply dataset-specific post-processing and create
+        # the final train/test split.
+        processed_datasets = cls.post_process_datasets(
+            datasets,
+            test_size=test_size,
+        )
 
         return processed_datasets
 
     @classmethod
-    def _get_dataset_sample_type(
-        cls,
-    ) -> type[domain.dataset.InstructDatasetSample] | type[domain.dataset.PreferenceDatasetSample]:
+    def _get_dataset_sample_type(cls,) -> type[InstructDatasetSample] | type[PreferenceDatasetSample]:
         return (
-            domain.dataset.InstructDatasetSample
+            InstructDatasetSample
             if cls.dataset_type == DatasetType.INSTRUCTION
-            else domain.dataset.PreferenceDatasetSample
+            else PreferenceDatasetSample
         )
 
     @classmethod
     @abstractmethod
-    def post_process_datasets(
-        cls, datasets: dict[DataCategory, domain.dataset.InstructDataset], test_size: float
-    ) -> TrainTestSplit:
+    def post_process_datasets(cls, datasets: dict[DataCategory, InstructDataset], test_size: float) -> TrainTestSplit:
         pass
 
-
+# Generator specifically for Instruction datasets.
 class InstructionDatasetGenerator(DatasetGenerator):
     dataset_type = DatasetType.INSTRUCTION
 
@@ -196,7 +311,7 @@ Extract:
 
     @classmethod
     def post_process_datasets(
-        cls, datasets: dict[DataCategory, domain.dataset.InstructDataset], test_size: float
+        cls, datasets: dict[DataCategory, InstructDataset], test_size: float
     ) -> TrainTestSplit:
         train_test_split = generation_utils.create_instruct_train_test_split(
             datasets, test_size=test_size, random_state=42
@@ -237,7 +352,7 @@ Extract:
 
     @classmethod
     def post_process_datasets(
-        cls, datasets: dict[DataCategory, domain.dataset.PreferenceDataset], test_size: float
+        cls, datasets: dict[DataCategory, PreferenceDataset], test_size: float
     ) -> TrainTestSplit:
         datasets = generation_utils.filter_short_answers(datasets)
         datasets = generation_utils.filter_answer_format(datasets)

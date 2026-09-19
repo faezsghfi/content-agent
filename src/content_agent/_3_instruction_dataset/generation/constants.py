@@ -1,4 +1,4 @@
-from content_agent._2_instruction_dataset.generation.dataset import DatasetType
+from content_agent._3_instruction_dataset.generation.dataset import DatasetType
 
 # Stores shared constants used throughout the instruction dataset generation pipeline.
 

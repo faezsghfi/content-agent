@@ -1,10 +1,10 @@
 from typing_extensions import Annotated
 from zenml import get_step_context, step
 
-from content_agent._2_instruction_dataset.generation.generation import generation
-from content_agent._2_instruction_dataset.generation.dataset import DatasetType
-from content_agent._2_instruction_dataset.generation.prompt import GenerateDatasetSamplesPrompt
-from content_agent._2_instruction_dataset.generation.types import DataCategory
+from content_agent._3_instruction_dataset.generation import generation
+from content_agent._3_instruction_dataset.generation.dataset import DatasetType
+from content_agent._3_instruction_dataset.generation.prompt import GenerateDatasetSamplesPrompt
+from content_agent._3_instruction_dataset.generation.types import DataCategory
 
 # Creates prompts from cleaned documents to generate instruction and preference examples.
 

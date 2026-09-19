@@ -1,19 +1,16 @@
 from enum import Enum
 
-from loguru import logger
-
-try:
-    from datasets import Dataset, DatasetDict, concatenate_datasets
-except ImportError:
-    logger.warning("Huggingface datasets not installed. Install with `pip install datasets`")
+from content_agent._3_instruction_dataset.generation.base.vector import VectorBaseDocument
+from content_agent._3_instruction_dataset.generation.types import DataCategory
 
 
-from content_agent._2_instruction_dataset.generation.base.vector import VectorBaseDocument
-from content_agent._2_instruction_dataset.generation.types import DataCategory
-
-
-# Defines dataset structures and utilities for managing generated instruction data.
-
+# Defines the two types of datasets generated in this stage.
+#
+# INSTRUCTION:
+#   instruction + answer
+#
+# PREFERENCE:
+#   instruction + chosen answer + rejected answer
 class DatasetType(Enum):
     INSTRUCTION = "instruction"
     PREFERENCE = "preference"
@@ -47,12 +44,14 @@ class InstructDataset(VectorBaseDocument):
     def num_samples(self) -> int:
         return len(self.samples)
 
-    def to_huggingface(self) -> "Dataset":
-        data = [sample.model_dump() for sample in self.samples]
-
-        return Dataset.from_dict(
-            {"instruction": [d["instruction"] for d in data], "output": [d["answer"] for d in data]}
-        )
+    def to_records(self) -> list[dict]:
+        return [
+            {
+                "instruction": sample.instruction,
+                "output": sample.answer,
+            }
+            for sample in self.samples
+        ]
 
 
 class TrainTestSplit(VectorBaseDocument):
@@ -60,18 +59,34 @@ class TrainTestSplit(VectorBaseDocument):
     test: dict
     test_split_size: float
 
-    def to_huggingface(self, flatten: bool = False) -> "DatasetDict":
-        train_datasets = {category.value: dataset.to_huggingface() for category, dataset in self.train.items()}
-        test_datasets = {category.value: dataset.to_huggingface() for category, dataset in self.test.items()}
+    def to_records(self, flatten: bool = False) -> dict:
+        train_records = {
+            category.value: dataset.to_records()
+            for category, dataset in self.train.items()
+        }
+
+        test_records = {
+            category.value: dataset.to_records()
+            for category, dataset in self.test.items()
+        }
 
         if flatten:
-            train_datasets = concatenate_datasets(list(train_datasets.values()))
-            test_datasets = concatenate_datasets(list(test_datasets.values()))
-        else:
-            train_datasets = Dataset.from_dict(train_datasets)
-            test_datasets = Dataset.from_dict(test_datasets)
+            train_records = [
+                record
+                for records in train_records.values()
+                for record in records
+            ]
 
-        return DatasetDict({"train": train_datasets, "test": test_datasets})
+            test_records = [
+                record
+                for records in test_records.values()
+                for record in records
+            ]
+
+        return {
+            "train": train_records,
+            "test": test_records,
+        }
 
 
 class InstructTrainTestSplit(TrainTestSplit):
@@ -94,16 +109,15 @@ class PreferenceDataset(VectorBaseDocument):
     def num_samples(self) -> int:
         return len(self.samples)
 
-    def to_huggingface(self) -> "Dataset":
-        data = [sample.model_dump() for sample in self.samples]
-
-        return Dataset.from_dict(
+    def to_records(self) -> list[dict]:
+        return [
             {
-                "prompt": [d["instruction"] for d in data],
-                "rejected": [d["rejected"] for d in data],
-                "chosen": [d["chosen"] for d in data],
+                "prompt": sample.instruction,
+                "rejected": sample.rejected,
+                "chosen": sample.chosen,
             }
-        )
+            for sample in self.samples
+        ]
 
 
 class PreferenceTrainTestSplit(TrainTestSplit):
@@ -115,10 +129,16 @@ class PreferenceTrainTestSplit(TrainTestSplit):
         category = DataCategory.PREFERENCE_DATASET
 
 
-def build_dataset(dataset_type, *args, **kwargs) -> InstructDataset | PreferenceDataset:
+def build_dataset(
+    dataset_type,
+    *args,
+    **kwargs,
+) -> InstructDataset | PreferenceDataset:
     if dataset_type == DatasetType.INSTRUCTION:
         return InstructDataset(*args, **kwargs)
+
     elif dataset_type == DatasetType.PREFERENCE:
         return PreferenceDataset(*args, **kwargs)
+
     else:
         raise ValueError(f"Invalid dataset type: {dataset_type}")
