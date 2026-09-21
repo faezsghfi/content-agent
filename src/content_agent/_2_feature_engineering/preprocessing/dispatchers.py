@@ -1,8 +1,8 @@
 from loguru import logger
 
 from content_agent._1_crawling_data.documents.NoSQLBaseDocument import NoSQLBaseDocument
-from content_agent._3_instruction_dataset.generation.base.vector import VectorBaseDocument
-from content_agent._3_instruction_dataset.generation.types import DataCategory
+from content_agent._3_instruction_preference_dataset.generation.base.vector import VectorBaseDocument
+from content_agent._3_instruction_preference_dataset.generation.types import DataCategory
 
 from .chunking_data_handlers import (
     ArticleChunkingHandler,

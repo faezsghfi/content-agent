@@ -1,7 +1,13 @@
 from enum import Enum
+from loguru import logger
 
-from content_agent._3_instruction_dataset.generation.base.vector import VectorBaseDocument
-from content_agent._3_instruction_dataset.generation.types import DataCategory
+from content_agent._3_instruction_preference_dataset.generation.base.vector import VectorBaseDocument
+from content_agent._3_instruction_preference_dataset.generation.types import DataCategory
+
+try:
+    from datasets import Dataset, DatasetDict, concatenate_datasets
+except ImportError:
+    logger.warning("Huggingface datasets not installed. Install with `pip install datasets`")
 
 
 # Defines the two types of datasets generated in this stage.
@@ -52,12 +58,31 @@ class InstructDataset(VectorBaseDocument):
             }
             for sample in self.samples
         ]
+    def to_huggingface(self) -> "Dataset":
+            data = [sample.model_dump() for sample in self.samples]
+    
+            return Dataset.from_dict(
+                {"instruction": [d["instruction"] for d in data], "output": [d["answer"] for d in data]}
+            )
 
 
 class TrainTestSplit(VectorBaseDocument):
     train: dict
     test: dict
     test_split_size: float
+
+    def to_huggingface(self, flatten: bool = False) -> "DatasetDict":
+            train_datasets = {category.value: dataset.to_huggingface() for category, dataset in self.train.items()}
+            test_datasets = {category.value: dataset.to_huggingface() for category, dataset in self.test.items()}
+    
+            if flatten:
+                train_datasets = concatenate_datasets(list(train_datasets.values()))
+                test_datasets = concatenate_datasets(list(test_datasets.values()))
+            else:
+                train_datasets = Dataset.from_dict(train_datasets)
+                test_datasets = Dataset.from_dict(test_datasets)
+    
+            return DatasetDict({"train": train_datasets, "test": test_datasets})
 
     def to_records(self, flatten: bool = False) -> dict:
         train_records = {
@@ -118,6 +143,16 @@ class PreferenceDataset(VectorBaseDocument):
             }
             for sample in self.samples
         ]
+    def to_huggingface(self) -> "Dataset":
+            data = [sample.model_dump() for sample in self.samples]
+    
+            return Dataset.from_dict(
+                {
+                    "prompt": [d["instruction"] for d in data],
+                    "rejected": [d["rejected"] for d in data],
+                    "chosen": [d["chosen"] for d in data],
+                }
+            )
 
 
 class PreferenceTrainTestSplit(TrainTestSplit):

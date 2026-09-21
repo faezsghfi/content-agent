@@ -2,7 +2,7 @@ import re
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter, SentenceTransformersTokenTextSplitter
 
-from content_agent._4_rag.embeddings import EmbeddingModelSingleton
+from content_agent._5_rag.embeddings import EmbeddingModelSingleton
 
 embedding_model = EmbeddingModelSingleton()
 

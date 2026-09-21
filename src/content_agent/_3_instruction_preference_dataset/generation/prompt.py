@@ -1,6 +1,6 @@
-from content_agent._3_instruction_dataset.generation.base.vector import VectorBaseDocument
-from content_agent._3_instruction_dataset.generation.cleaned_documents import CleanedDocument
-from content_agent._3_instruction_dataset.generation.types import DataCategory
+from content_agent._3_instruction_preference_dataset.generation.base.vector import VectorBaseDocument
+from content_agent._3_instruction_preference_dataset.generation.cleaned_documents import CleanedDocument
+from content_agent._3_instruction_preference_dataset.generation.types import DataCategory
 
 # Defines the prompt templates used for generating structured training examples.
 

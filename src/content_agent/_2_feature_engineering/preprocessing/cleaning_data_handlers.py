@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from content_agent._3_instruction_dataset.generation.cleaned_documents import (
+from content_agent._3_instruction_preference_dataset.generation.cleaned_documents import (
     CleanedArticleDocument,
     CleanedDocument,
     CleanedPostDocument,

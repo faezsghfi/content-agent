@@ -6,7 +6,7 @@ from typing_extensions import Annotated
 from zenml import step
 
 from content_agent._1_crawling_data.documents.NoSQLBaseDocument import NoSQLBaseDocument
-from content_agent._3_instruction_dataset.generation.cleaned_documents import (
+from content_agent._3_instruction_preference_dataset.generation.cleaned_documents import (
     CleanedArticleDocument,
     CleanedDocument,
     CleanedPostDocument,

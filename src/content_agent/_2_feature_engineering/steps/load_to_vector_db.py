@@ -4,7 +4,7 @@ from zenml import step
 
 from content_agent.utilities import misc
 
-from content_agent._3_instruction_dataset.generation.base.vector import VectorBaseDocument
+from content_agent._3_instruction_preference_dataset.generation.base.vector import VectorBaseDocument
 
 
 @step

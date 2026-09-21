@@ -10,10 +10,10 @@ from qdrant_client.http import exceptions
 from qdrant_client.http.models import Distance, VectorParams
 from qdrant_client.models import CollectionInfo, PointStruct, Record
 
-from content_agent._4_rag.embeddings import EmbeddingModelSingleton
+from content_agent._5_rag.embeddings import EmbeddingModelSingleton
 from content_agent.utilities.exceptions import ImproperlyConfigured
-from content_agent._3_instruction_dataset.generation.types import DataCategory
-from content_agent._4_rag.qdrant import connection
+from content_agent._3_instruction_preference_dataset.generation.types import DataCategory
+from content_agent._5_rag.qdrant import connection
 
 T = TypeVar("T", bound="VectorBaseDocument")
 

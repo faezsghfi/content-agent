@@ -9,10 +9,10 @@ from langchain_openai import ChatOpenAI
 from loguru import logger
 
 from content_agent.utilities import misc
-from content_agent._3_instruction_dataset.generation.cleaned_documents import CleanedDocument
-from content_agent._3_instruction_dataset.generation.dataset import DatasetType, TrainTestSplit , build_dataset , PreferenceDatasetSample , InstructDatasetSample , InstructDataset , PreferenceDataset
-from content_agent._3_instruction_dataset.generation.prompt import GenerateDatasetSamplesPrompt, Prompt
-from content_agent._3_instruction_dataset.generation.types import DataCategory
+from content_agent._3_instruction_preference_dataset.generation.cleaned_documents import CleanedDocument
+from content_agent._3_instruction_preference_dataset.generation.dataset import DatasetType, TrainTestSplit , build_dataset , PreferenceDatasetSample , InstructDatasetSample , InstructDataset , PreferenceDataset
+from content_agent._3_instruction_preference_dataset.generation.prompt import GenerateDatasetSamplesPrompt, Prompt
+from content_agent._3_instruction_preference_dataset.generation.types import DataCategory
 from content_agent.utilities.settings import settings
 
 from . import constants
@@ -233,11 +233,12 @@ Provide your response in JSON format.
                             dataset_sample_batch
                         )
 
-                except OutputParserException:
-                    logger.exception(
+                except OutputParserException as e:
+                    logger.error(
                         "Failed to parse the output JSON for a batch "
                         f"for category {category}"
                     )
+                    logger.error(f"Raw LLM output:\n{e.llm_output}")
                     raise
 
             logger.info(
@@ -292,7 +293,8 @@ context. Only use concepts from the context to generate the instructions. \
 Instructions must never explicitly mention a context, a system, a course, or an extract. \
 Instructions must be self-contained and general. \
 Answers must imitate the writing style of the context. \
-    
+Do not use LaTeX notation or backslashes in the generated answers. \
+
 Example instruction: Explain the concept of an LLM Twin. \
 Example answer: An LLM Twin is essentially an AI character that mimics your writing style, personality, and voice. \
 It's designed to write just like you by incorporating these elements into a language model. \

@@ -4,7 +4,7 @@ from typing import Generic, TypeVar
 from uuid import UUID
 
 from content_agent._2_feature_engineering.preprocessing.documents.chunks import ArticleChunk, Chunk, PostChunk, RepositoryChunk
-from content_agent._3_instruction_dataset.generation.cleaned_documents import (
+from content_agent._3_instruction_preference_dataset.generation.cleaned_documents import (
     CleanedArticleDocument,
     CleanedDocument,
     CleanedPostDocument,

@@ -15,7 +15,6 @@ def save_to_mongodb(
 ) -> None:
     logger.info(f"Saving dataset {dataset_id} to MongoDB.")
 
-    # Check dataset structure before converting it to records.
     logger.info(f"Dataset type: {type(dataset).__name__}")
     logger.info(f"Train categories: {list(dataset.train.keys())}")
     logger.info(f"Test categories: {list(dataset.test.keys())}")
@@ -32,7 +31,6 @@ def save_to_mongodb(
             f"{test_dataset.num_samples} samples"
         )
 
-    # Convert the dataset into MongoDB-compatible records.
     records = dataset.to_records(flatten=True)
 
     train_records = records["train"]
@@ -44,11 +42,19 @@ def save_to_mongodb(
         f"{len(test_records)} test"
     )
 
-    # Do not silently succeed with an empty dataset.
     if not train_records and not test_records:
         raise ValueError(
             f"Dataset '{dataset_id}' is empty. "
             "No train or test records were generated."
+        )
+
+    if type(dataset).__name__.startswith("Preference"):
+        collection_prefix = "preference_dataset"
+    elif type(dataset).__name__.startswith("Instruct"):
+        collection_prefix = "instruction_dataset"
+    else:
+        raise ValueError(
+            f"Unsupported dataset type: {type(dataset).__name__}"
         )
 
     client = MongoClient(settings.DATABASE_HOST)
@@ -56,10 +62,9 @@ def save_to_mongodb(
     try:
         db = client[settings.DATABASE_NAME]
 
-        train_collection = db["instruction_dataset_train"]
-        test_collection = db["instruction_dataset_test"]
+        train_collection = db[f"{collection_prefix}_train"]
+        test_collection = db[f"{collection_prefix}_test"]
 
-        # Replace previous dataset contents.
         train_collection.delete_many({})
         test_collection.delete_many({})
 

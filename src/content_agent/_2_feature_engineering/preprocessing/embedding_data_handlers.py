@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, cast
 
-from content_agent._4_rag.embeddings import EmbeddingModelSingleton
+from content_agent._5_rag.embeddings import EmbeddingModelSingleton
 from content_agent._2_feature_engineering.preprocessing.documents.chunks import ArticleChunk, Chunk, PostChunk, RepositoryChunk
 from content_agent._2_feature_engineering.preprocessing.documents.embedded_chunks import (
     EmbeddedArticleChunk,

@@ -1,8 +1,8 @@
 from sklearn.model_selection import train_test_split
 
-from content_agent._3_instruction_dataset.generation.chunking import chunk_document
-from content_agent._3_instruction_dataset.generation.cleaned_documents import CleanedDocument
-from content_agent._3_instruction_dataset.generation.dataset import (
+from content_agent._3_instruction_preference_dataset.generation.chunking import chunk_document
+from content_agent._3_instruction_preference_dataset.generation.cleaned_documents import CleanedDocument
+from content_agent._3_instruction_preference_dataset.generation.dataset import (
     InstructDataset,
     InstructDatasetSample,
     InstructTrainTestSplit,
@@ -10,7 +10,7 @@ from content_agent._3_instruction_dataset.generation.dataset import (
     PreferenceDatasetSample,
     PreferenceTrainTestSplit,
 )
-from content_agent._3_instruction_dataset.generation.types import DataCategory
+from content_agent._3_instruction_preference_dataset.generation.types import DataCategory
 
 # Provides utility functions shared across the dataset generation pipeline.
 
